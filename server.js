@@ -15,7 +15,7 @@ var session      = require('express-session');
 var configDB = require('./config/database.js');
 
 // configuration ===============================================================
-mongoose.connect(configDB.url); // connect to our database
+mongoose.connect(configDB.mongoInstanceUrl); // connect to our database
 require('./config/passport')(passport); // pass passport for configuration
 
 // set up our express application
@@ -26,25 +26,10 @@ app.use(bodyParser()); // get information from html forms
 app.set('view engine', 'ejs'); // set up ejs for templating
 
 // required for passport
-app.use(session({ secret: 'ilovescotchscotchyscotchscotch'})); // session secret
-app.use(function(req, res, next){
-	console.log('express session created with ID: ', req.session.id, ', cookie expiry : ', req.session.cookie.expires);
-	console.log('initializing passport');
-	next();
-})
+app.use(session({ secret: 'DemoAuthSecret'})); // session secret
 
 app.use(passport.initialize());
-app.use(function(req, res, next){	
-	console.log('invoking passport.session()');
-	next();
-})
 app.use(passport.session()); // persistent login sessions
-
-app.use(function(req, res, next){
-	console.log('req.user', req.user);
-	console.log('passport complete');
-	next();
-})
 
 app.use(flash()); // use connect-flash for flash messages stored in session
 
@@ -53,3 +38,21 @@ require('./app/routes.js')(app, passport); // load our routes and pass in our ap
 // launch ======================================================================
 app.listen(port);
 console.log('The magic happens on port ' + port);
+
+
+/*
+app.use(function(req, res, next){
+	console.log('express session created with ID: ', req.session.id, ', cookie expiry : ', req.session.cookie.expires);
+	console.log('initializing passport');
+	next();
+})
+app.use(function(req, res, next){	
+	console.log('invoking passport.session()');
+	next();
+})
+app.use(function(req, res, next){
+	console.log('req.user', req.user);
+	console.log('passport complete');
+	next();
+})
+*/

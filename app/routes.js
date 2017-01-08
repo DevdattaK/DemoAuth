@@ -1,3 +1,5 @@
+var User = require('./models/user');
+
 module.exports = function(app, passport) {
 
     // =====================================
@@ -37,7 +39,6 @@ module.exports = function(app, passport) {
     // =====================================
     // show the signup form
     app.get('/signup', function(req, res) {
-
         // render the page and pass in any flash data if it exists
         res.render('signup.ejs', { message: req.flash('signupMessage') });
     });
@@ -45,15 +46,40 @@ module.exports = function(app, passport) {
     // process the signup form
     // app.post('/signup', do all our passport stuff here);
     // process the signup form
-    app.post('/signup', function(req, res, next){
-            console.log('signup - about to invoke passport.authenticate');
-            next();
+    app.post('/signup', 
+        /**/
+        function(req, res, next){
+            var _username = req.body.username;
+            var _password = req.body.password;
+
+            User.findOne({'local.username' : _username}, function(err, user){
+                if(err){
+                    return next(err);
+                }
+                if(user){
+                    req.flash('signupMessage', 'User with same username exist already.');
+                    return res.redirect('signup');
+                }
+
+                var newUser = new User();
+                newUser.local.username = _username;
+                newUser.local.password = _password;
+                newUser.local.displayName = req.body.displayName;
+
+                newUser.save(function(err){
+                    if(err)
+                        return next(err);
+
+                    console.log('saved user. Calling passport.authenticate() now');
+                    return next();
+                });
+            })
         },
-        passport.authenticate('local-signup', {
-        successRedirect : '/profile', // redirect to the secure profile section
-        failureRedirect : '/signup', // redirect back to the signup page if there is an error
-        failureFlash : true // allow flash messages
-        //session : false     //disabling session support
+        /**/
+         passport.authenticate('local-signup', {
+            successRedirect:'/profile',
+            failureRedirect:'/signup',        
+            failureFlash:true
     }));
 
     // =====================================
