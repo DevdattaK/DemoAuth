@@ -23,6 +23,10 @@ var userSchema = mongoose.Schema({
         },
         displayName : {
             type : String
+        },
+        profilePic : {
+            contentType : String,
+            base64EncodedImage : String           //base64 encoded string
         }
     },
     facebook         : {
@@ -52,14 +56,21 @@ userSchema.methods.generateHash = function(password) {
     return bcrypt.hashSync(password, bcrypt.genSaltSync(8), null);
 };
 
+
+userSchema.methods.getProfilePic = function(){
+    return this.local.profilePic.base64EncodedImage;
+};
+
 // checking if password is valid
 userSchema.methods.validPassword = function(password) {
-    return bcrypt.compareSync(password, this.local.password);
+    var isValidPassword = bcrypt.compareSync(password, this.local.password);
+    console.log('isValidPassword (bcrypt.compareSync result): ', isValidPassword);
+    return isValidPassword;
 };
 
 userSchema.methods.name = function(){
     //pass displayName if populated, otherwise pass username
-    return this.displayName || this.username;
+    return this.local.displayName || this.local.username;
 };
 
 // pre-save to apply uniform logic for every user that gets added to DB

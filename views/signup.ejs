@@ -10,8 +10,12 @@
         <div class="alert alert-danger"><%= message %></div>
     <% } %>
 
+        <style>
+            input {padding : 5px;}
+        </style>  
+
     <!-- LOGIN FORM -->
-    <form action="/signup" method="post">
+    <form action="/signup" method="post" enctype="multipart/form-data">
         <div class="form-group">
             <label>Username</label>
             <input type="text" placeholder="username" class="form-control" name="username">
@@ -23,6 +27,17 @@
         <div class="form-group">
             <label>Display Name</label>
             <input type="text" placeholder="Word/phrase used on profile" class="form-control" name="displayName"> 
+        </div>
+        <div class="form-group">
+            <label for="profilePic">Select Profile Image: </label>
+            <div class="row">
+                <div class="col-sm-9">
+                    <input type="file" class="form-control" name="profilePic">              
+                </div>
+                <div class="col-sm-3">
+                    Preview : <img src="">
+                </div>
+            </div>
         </div>
         <button type="submit" class="btn btn-warning btn-lg">Signup</button>
     </form>

@@ -1,4 +1,7 @@
 var User = require('./models/user');
+var multer = require('multer');
+var upload = multer({des : '../uploads'});
+var fs = require('fs');
 
 module.exports = function(app, passport) {
 
@@ -48,9 +51,14 @@ module.exports = function(app, passport) {
     // process the signup form
     app.post('/signup', 
         /**/
+        upload.single('profilePic'),
         function(req, res, next){
             var _username = req.body.username;
             var _password = req.body.password;
+
+            var base64Encoded = req.file.buffer.toString('base64');
+
+            console.log('Encoded String : ', base64Encoded);
 
             User.findOne({'local.username' : _username}, function(err, user){
                 if(err){
@@ -58,13 +66,16 @@ module.exports = function(app, passport) {
                 }
                 if(user){
                     req.flash('signupMessage', 'User with same username exist already.');
-                    return res.redirect('signup');
+                    return res.redirect('/signup');
                 }
 
                 var newUser = new User();
                 newUser.local.username = _username;
                 newUser.local.password = _password;
                 newUser.local.displayName = req.body.displayName;
+                newUser.local.profilePic.contentType = req.file.mimetype;
+                newUser.local.profilePic.base64EncodedImage = ' ';
+                newUser.local.profilePic.base64EncodedImage = 'data:' + req.file.mimetype + ';base64,' + base64Encoded;
 
                 newUser.save(function(err){
                     if(err)

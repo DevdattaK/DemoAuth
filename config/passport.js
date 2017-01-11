@@ -35,7 +35,7 @@ module.exports = function(passport) {
     },
     function(req, username, password, done) { 
         // find a user whose username is the same as the username typed by current user
-        
+        console.log('searching for user by local.username.')
         User.findOne({ 'local.username' :  username }, function(err, user) {
             // if there are any errors, return the error before anything else
             if (err)
@@ -49,6 +49,7 @@ module.exports = function(passport) {
             if (!user.validPassword(password))
                 return done(null, false, req.flash('loginMessage', 'Oops! Wrong password.')); // create the loginMessage and save it to session as flashdata
 
+            console.log('user found. Invoking done(null, user)');
             // all is well, return successful user
             return done(null, user);
         });
